@@ -1,0 +1,41 @@
+#!/bin/bash
+
+while getopts d:f: flag
+do
+    case "${flag}" in
+        d) date=${OPTARG};;
+        f) filename=${OPTARG};;
+        ?) echo "Usage: cookie-analyser -f /path/to/log.csv -d YYYY-MM-DD."; exit 1;;
+    esac
+done
+
+if [ -z "$filename" ]
+then
+  echo "Missing -f, please specify the file to analyse"
+  exit 1
+fi
+
+if [ -z "$date" ]
+then
+  echo "Missing -d, please specify the date to search for"
+  exit 1
+fi
+
+lines=$(cat $filename | grep ",$date" | awk -F',' '{print $1}' | sort | uniq -c | sort -rn)
+max_occurence=$(echo "$lines" | head -n 1 | awk -F' ' '{print $1}')
+
+IFS=$'\n'
+for line in $(echo "$lines")
+do
+
+  count=$(echo $line | awk -F' ' '{print $1}')
+  cookie=$(echo $line | awk -F' ' '{print $2}')
+
+  if [ "$count" != "$max_occurence" ]
+  then
+    exit 0
+  else
+    echo $cookie
+  fi
+
+done

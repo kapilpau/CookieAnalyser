@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+const commander = require('commander');
+const { analyseCookies } = require("./internal/cookie-analyser");
+
+const main = () => {
+    commander
+        .usage('[OPTIONS]...')
+        .requiredOption('-f <value>', 'Cookie log to analyse.')
+        .requiredOption('-d <value>', 'Date to search for.')
+        .parse(process.argv);
+
+    const options = commander.opts();
+    analyseCookies(options.filename, options.date);
+}
+
+main();
